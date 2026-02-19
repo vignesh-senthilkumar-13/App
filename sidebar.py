@@ -6,7 +6,12 @@ from datetime import datetime, timedelta
 st.set_page_config(page_title="Board Shipment Tracker", layout="wide")
 #st_autorefresh(interval=30000)
 
-excel_file = "App/Device_Management.xlsx"
+import os
+excel_file = "Device_Management.xlsx"
+if not os.path.exists(excel_file):
+    st.error("Excel file not found. Please check repo path.")
+else:
+    sheet_names = pd.ExcelFile(excel_file).sheet_names
 
 def get_data(sheet: str) -> pd.DataFrame:
     df = pd.read_excel(excel_file, sheet_name=sheet)
@@ -90,5 +95,6 @@ elif selected_sheet == "BOARD STATUS":
             with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df2.to_excel(writer, sheet_name="BOARD STATUS", index=False)
             st.success("✅ Updates saved to BOARD STATUS")
+
 
 
