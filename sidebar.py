@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 st.set_page_config(page_title="Board Shipment Tracker", layout="wide")
 #st_autorefresh(interval=30000)
 
-excel_file = "Device_Management.xlsx"
+excel_file = "App/Device_Management.xlsx"
 
 def get_data(sheet: str) -> pd.DataFrame:
     df = pd.read_excel(excel_file, sheet_name=sheet)
@@ -90,4 +90,5 @@ elif selected_sheet == "BOARD STATUS":
             with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df2.to_excel(writer, sheet_name="BOARD STATUS", index=False)
             st.success("✅ Updates saved to BOARD STATUS")
+
 
