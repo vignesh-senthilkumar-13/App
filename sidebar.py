@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
-from streamlit_autorefresh import st_autorefresh
+#from streamlit_autorefresh import st_autorefresh
 
 st.set_page_config(page_title="Board Shipment Tracker", layout="wide")
-st_autorefresh(interval=30000)
+#st_autorefresh(interval=30000)
 
 excel_file = "Device_Management.xlsx"
 
@@ -90,3 +90,4 @@ elif selected_sheet == "BOARD STATUS":
             with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df2.to_excel(writer, sheet_name="BOARD STATUS", index=False)
             st.success("✅ Updates saved to BOARD STATUS")
+
