@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 from streamlit_autorefresh import st_autorefresh
 import requests
-import plotly.express as px
+# import plotly.express as px
 GITHUB_URL = "https://raw.githubusercontent.com/vignesh-senthilkumar-13/App/main/Device_Management.xlsx"
 LOCAL_FILE = r"C:\Users\vigneshs1\Desktop\Device_Management.xlsx"
 st.set_page_config(page_title="Board Shipment Tracker", layout="wide")
@@ -117,30 +117,7 @@ if selected_sheet == "DASHBOARD":
 
 
     # Assuming df3 is your BOARD STATUS DataFrame
-    df3 = get_data("BOARD STATUS")
 
-    # Ensure DATE column is datetime
-    if "DATE" in df3.columns:
-        df3["DATE"] = pd.to_datetime(df3["DATE"], errors="coerce")
-
-    st.title("📊 Dashboard – BOARD STATUS Timeline")
-
-    # --- Timeline Animation ---
-    st.subheader("⏳ Status Timeline Animation")
-
-    # Example: Animated scatter plot showing Device vs Version over time
-    fig = px.scatter(
-        df3,
-        x="Device",
-        y="Version",
-        color="Status",
-        animation_frame=df3["DATE"].dt.strftime("%Y-%m-%d"),  # animate by date
-        animation_group="Device",  # group by device so points move over time
-        size_max=20,
-        title="Board Status Progression Over Time"
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
 
 
 elif selected_sheet == "BOARD STATUS":
