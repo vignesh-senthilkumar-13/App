@@ -9,6 +9,8 @@ oauth2client
 pandas
 openpyxl
 gspread
+google
+oauth2
 
 
 
