@@ -118,62 +118,42 @@ if selected_sheet == "DASHBOARD":
 
     # Assuming df3 is your BOARD STATUS DataFrame
 
-    import plotly.express as px
     import streamlit as st
     import pandas as pd
-    from datetime import datetime, timedelta
     
-    df3 = get_data("BOARD STATUS")
-    df3 = df3.reset_index(drop=True)
+    # Example data (replace with get_data("BOARD STATUS"))
+    df3 = pd.DataFrame({
+        "Device": ["4842", "4832"],
+        "Version": ["A0", "A1"],
+        "Status": ["DESIGN", "FAB"],
+        "DATE": ["2026-02-25", "2026-03-02"]
+    })
     
-    # Ensure DATE column is datetime
-    if "DATE" in df3.columns:
-        df3["DATE"] = pd.to_datetime(df3["DATE"], errors="coerce")
+    # Define the ordered stages
+    status_stages = ["DESIGN", "FAB", "BOARD", "PCB", "DONE"]
     
-    st.title("BOARD STATUS")
+    st.title("BOARD STATUS – Stage Flow")
     
-    # --- Upcoming deadlines section ---
-    st.subheader("⚠️ Upcoming Deadlines (within 7 days)")
-    today = datetime.today().date()
-    upcoming = df3[df3["DATE"].dt.date <= today + timedelta(days=7)]
+    # Group by version so each version gets its own slider
+    for version, group in df3.groupby("Version"):
+        st.subheader(f"Version {version}")
     
-    if not upcoming.empty:
-        st.metric("Entries Due Soon", len(upcoming))
-        st.table(upcoming[["Device", "Version", "Status", "DATE"]])
-    else:
-        st.info("No upcoming deadlines within 7 days.")
+        # Find current stage for this version
+        current_status = group["Status"].iloc[-1] if not group.empty else "DESIGN"
+        current_index = status_stages.index(current_status) if current_status in status_stages else 0
     
-    # --- Status Flow Timeline ---
-    st.subheader("📈 Status Progression Flow")
+        # Slider for stage progression
+        stage_index = st.slider(
+            f"Progression for Version {version}",
+            min_value=0,
+            max_value=len(status_stages)-1,
+            value=current_index,
+            format_func=lambda x: status_stages[x]
+        )
     
-    # Sort by date so statuses appear in order
-    df3 = df3.sort_values("DATE")
-    
-    # Map statuses to a numeric order for plotting
-    status_order = {"DESIGN":1, "FAB":2, "BOARD":3, "PCB":4, "DONE":5}
-    df3["StatusOrder"] = df3["Status"].map(status_order)
-    
-    fig = px.line(
-        df3,
-        x="DATE",
-        y="StatusOrder",
-        color="Device",
-        markers=True,
-        text="Status",
-        hover_data=["Device","Version","Status"],
-        title="Status Progression Timeline"
-    )
-    
-    # Replace numeric y-axis with status labels
-    fig.update_yaxes(
-        tickvals=list(status_order.values()),
-        ticktext=list(status_order.keys())
-    )
-    
-    # Show status labels on points
-    fig.update_traces(textposition="top center")
-    
-    st.plotly_chart(fig, use_container_width=True)
+        # Display the selected stage
+        st.write(f"➡️ Current Stage: **{status_stages[stage_index]}**")
+
 
 
 
@@ -413,6 +393,7 @@ elif selected_sheet == "BUG LIST":
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
 
             st.success("✅ Updates saved to BUG LIST with new bugs auto‑populated")
+
 
 
 
