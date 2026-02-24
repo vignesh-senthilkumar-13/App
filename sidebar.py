@@ -118,6 +118,45 @@ if selected_sheet == "DASHBOARD":
 
     # Assuming df3 is your BOARD STATUS DataFrame
 
+   import plotly.express as px
+import streamlit as st
+import pandas as pd
+from datetime import datetime, timedelta
+
+df3 = get_data("BOARD STATUS")
+df3 = df3.reset_index(drop=True)
+
+# Ensure DATE column is datetime
+if "DATE" in df3.columns:
+    df3["DATE"] = pd.to_datetime(df3["DATE"], errors="coerce")
+
+st.title("BOARD STATUS")
+
+# --- Upcoming deadlines section ---
+st.subheader("⚠️ Upcoming Deadlines (within 7 days)")
+today = datetime.today().date()
+upcoming = df3[df3["DATE"].dt.date <= today + timedelta(days=7)]
+
+if not upcoming.empty:
+    st.metric("Entries Due Soon", len(upcoming))
+    st.table(upcoming[["Device", "Version", "Status", "DATE"]])
+else:
+    st.info("No upcoming deadlines within 7 days.")
+
+# --- Timeline Visualization ---
+st.subheader("📈 Interactive Status Timeline")
+
+fig = px.scatter(
+    df3,
+    x="DATE",
+    y="Device",
+    color="Status",
+    symbol="Version",
+    hover_data=["Version", "Status"],
+    title="Board Status Progression Over Time"
+)
+
+st.plotly_chart(fig, use_container_width=True)
 
 
 elif selected_sheet == "BOARD STATUS":
@@ -356,3 +395,4 @@ elif selected_sheet == "BUG LIST":
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
 
             st.success("✅ Updates saved to BUG LIST with new bugs auto‑populated")
+
