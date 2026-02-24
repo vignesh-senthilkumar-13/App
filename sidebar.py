@@ -244,7 +244,7 @@ elif selected_sheet == "BUG LIST":
 
     st.title("🐞 Bug Tracking Dashboard – BUG LIST")
 
-    # Filters
+    # --- Filters on all columns ---
     test_filter = st.multiselect("Filter by Test", df_bug["TEST"].dropna().unique())
     bug_filter = st.multiselect("Filter by Bug", df_bug["BUG"].dropna().unique())
     device_filter = st.multiselect("Filter by Device", df_bug["DEVICE"].dropna().unique())
@@ -263,6 +263,7 @@ elif selected_sheet == "BUG LIST":
     if status_filter:
         filtered_df_bug = filtered_df_bug[filtered_df_bug["STATUS"].isin(status_filter)]
 
+    # --- Editable table ---
     with st.form("edit_form_bug"):
         edited_df_bug = st.data_editor(
             filtered_df_bug,
@@ -273,87 +274,21 @@ elif selected_sheet == "BUG LIST":
                     "Status",
                     options=["NOT VERIFIED", "IN PROGRESS", "VERIFIED", "CLOSED"],
                     width="medium"
-                )
+                ),"DEVICE": st.column_config.SelectboxColumn(
+                    "DEVICE",
+                    options=["4832",'4842','4851','4852','4992'],
+                    width="medium")
+
             }
         )
 
         save_bug = st.form_submit_button("💾 Save BUG LIST Updates")
-        # if save_bug:
-        #     # --- Important logic: auto‑populate new bug across all Device/Version ---
-        #     all_devices = df_bug["DEVICE"].unique()
-        #     all_versions = df_bug["VERSION"].unique()
-        #
-        #     # Find new bugs added in editor
-        #     new_bugs = set(edited_df_bug["BUG"]) - set(df_bug["BUG"])
-        #
-        #     rows_to_add = []
-        #     new_test = row["TEST"]
-        #     for bug in new_bugs:
-        #         for dev in all_devices:
-        #             for ver in all_versions:
-        #                 # Only add if not already present
-        #                 if not ((edited_df_bug["BUG"] == bug) &
-        #                         (edited_df_bug["DEVICE"] == dev) &
-        #                         (edited_df_bug["VERSION"] == ver)).any():
-        #                     rows_to_add.append({
-        #                         "TEST": new_test,  # leave blank or set default
-        #                         "BUG": bug,
-        #                         "DEVICE": dev,
-        #                         "VERSION": ver,
-        #                         "STATUS": "NOT VERIFIED"
-        #                     })
-        #
-        #     if rows_to_add:
-        #         edited_df_bug = pd.concat([edited_df_bug, pd.DataFrame(rows_to_add)], ignore_index=True)
-        #
-        #     # Save back to Excel
-        #     with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
-        #         edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
-        #
-        #     st.success("✅ Updates saved to BUG LIST with new bugs auto‑populated")
-        #
-        # save_bug = st.form_submit_button("💾 Save BUG LIST Updates")
         if save_bug:
-            # --- Important logic: auto‑populate new bug across all Device/Version ---
-            all_devices = df_bug["DEVICE"].unique()
-            all_versions = df_bug["VERSION"].unique()
-
-            # Find new bugs added in editor
-            new_rows = edited_df_bug.merge(
-                df_bug[["BUG"]].drop_duplicates(),
-                on="BUG",
-                how="left",
-                indicator=True
-            )
-            # Rows marked 'left_only' are new bugs
-            new_bugs_df = new_rows[new_rows["_merge"] == "left_only"]
-
-            rows_to_add = []
-            for _, row in new_bugs_df.iterrows():
-                new_bug = row["BUG"]
-                new_test = row["TEST"]   # <-- use the new TEST value entered
-                for dev in all_devices:
-                    for ver in all_versions:
-                        # Only add if not already present
-                        if not ((edited_df_bug["BUG"] == new_bug) &
-                                (edited_df_bug["DEVICE"] == dev) &
-                                (edited_df_bug["VERSION"] == ver)).any():
-                            rows_to_add.append({
-                                "TEST": new_test,          # now filled with the new TEST
-                                "BUG": new_bug,
-                                "DEVICE": dev,
-                                "VERSION": ver,
-                                "STATUS": "NOT VERIFIED"
-                            })
-
-            if rows_to_add:
-                edited_df_bug = pd.concat([edited_df_bug, pd.DataFrame(rows_to_add)], ignore_index=True)
-
-            # Save back to Excel
             with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
+            st.success("✅ Updates saved to BUG LIST")
 
-            st.success("✅ Updates saved to BUG LIST with new bugs auto‑populated")
+
 
 
 
