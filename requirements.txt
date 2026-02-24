@@ -8,6 +8,7 @@ pydrive
 oauth2client
 pandas
 openpyxl
+gspread
 
 
 
