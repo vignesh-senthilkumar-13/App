@@ -8,6 +8,18 @@ GITHUB_URL = "https://raw.githubusercontent.com/vignesh-senthilkumar-13/App/main
 LOCAL_FILE = r"C:\Users\vigneshs1\Desktop\Device_Management.xlsx"
 st.set_page_config(page_title="Board Shipment Tracker", layout="wide")
 st_autorefresh(interval=30000)
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+import streamlit as st
+import json
+
+# Load secrets
+client_config = json.loads(st.secrets["client_secrets"])
+
+gauth = GoogleAuth()
+gauth.settings['client_config'] = client_config
+gauth.LocalWebserverAuth()   # opens browser for login
+drive = GoogleDrive(gauth)
 
 excel_file = "Device_Management.xlsx"
 from github import Github
@@ -438,6 +450,7 @@ elif selected_sheet == "BUG LIST":
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
             st.success("✅ Updates saved to BUG LIST")
             commit_to_github(repo_name="App", file_path=excel_file, commit_message="Update BOARD STATUS sheet")
+
 
 
 
