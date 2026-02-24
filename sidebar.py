@@ -1,16 +1,18 @@
 import streamlit as st
 import pandas as pd
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-
 from google.oauth2.service_account import Credentials
-import gspread
 
-creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"])
+# --- Google Sheets Setup ---
+scope = ["https://www.googleapis.com/auth/spreadsheets",
+         "https://www.googleapis.com/auth/drive"]
+
+creds = Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"], scopes=scope
+)
 client = gspread.authorize(creds)
 
-
-SHEET_ID = "https://docs.google.com/spreadsheets/d/1moWLEIQxMImvZnaJbiwstK0bGfn50g_N5gNz0aHsIak/edit?usp=sharing"  # replace with your Google Sheet ID
+SHEET_ID = "1moWLEIQxMImvZnaJbiwstK0bGfn50g_N5gNz0aHsIak"
 
 def get_data(sheet_name: str) -> pd.DataFrame:
     worksheet = client.open_by_key(SHEET_ID).worksheet(sheet_name)
@@ -21,6 +23,7 @@ def save_data(sheet_name: str, df: pd.DataFrame):
     worksheet = client.open_by_key(SHEET_ID).worksheet(sheet_name)
     worksheet.clear()
     worksheet.update([df.columns.values.tolist()] + df.values.tolist())
+
 
 # --- BUG LIST Section ---
 if selected_sheet == "BUG LIST":
@@ -135,5 +138,6 @@ if selected_sheet == "BUG LIST":
             save_data("BUG LIST", edited_df_bug)
 
             st.success("✅ BUG LIST updated in Google Sheets")
+
 
 
