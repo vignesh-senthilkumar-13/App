@@ -117,6 +117,46 @@ if selected_sheet == "DASHBOARD":
 
 
     # Assuming df3 is your BOARD STATUS DataFrame
+    import streamlit as st
+    import pandas as pd
+    
+    # Load BOARD STATUS data from Excel
+    df3 = get_data("BOARD STATUS")
+    df3 = df3.reset_index(drop=True)
+    
+    # Ensure DATE column is datetime
+    if "DATE" in df3.columns:
+        df3["DATE"] = pd.to_datetime(df3["DATE"], errors="coerce")
+    
+    st.title("BOARD STATUS – Stage Flow")
+    
+    # Define ordered workflow stages
+    status_stages = [
+        "PCB INPUTS", "SCH DESIGN", "SCH REVIEW", "PCB-RELEASE",
+        "QUOTATION-RECEIVED", "QUOTATION-APPROVED",
+        "UNDER FAB", "BOARDS RECEIVED"
+    ]
+    
+    # Loop through each Version in Excel
+    for version, group in df3.groupby("Version"):
+        st.subheader(f"Version {version}")
+    
+        # Find the latest status for this version from Excel
+        if not group.empty:
+            current_status = group.sort_values("DATE")["Status"].iloc[-1]
+        else:
+            current_status = status_stages[0]  # default to first stage
+    
+        # Stage slider (select_slider shows labels instead of numbers)
+        stage = st.select_slider(
+            f"Progression for Version {version}",
+            options=status_stages,
+            value=current_status,
+            key=f"slider_{version}"
+        )
+    
+        # Display the selected stage
+        st.write(f"➡️ Current Stage: **{stage}**")
 
 elif selected_sheet == "BOARD STATUS":
     df3 = get_data("BOARD STATUS")
@@ -287,6 +327,7 @@ elif selected_sheet == "BUG LIST":
             with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
             st.success("✅ Updates saved to BUG LIST")
+
 
 
 
