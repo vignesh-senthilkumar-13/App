@@ -3,7 +3,8 @@ pandas
 openpyxl
 plotly
 streamlit_autorefresh
-github
+PyGithub
+
 
 
 
