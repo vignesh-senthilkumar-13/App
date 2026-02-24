@@ -294,7 +294,7 @@ elif selected_sheet == "BOARD STATUS":
             if "DATE" in edited_df3.columns:
                 edited_df3["DATE"] = pd.to_datetime(edited_df3["DATE"], errors="coerce")
 
-            with pd.ExcelWriter(excel_file, mode="w", if_sheet_exists="replace") as writer:
+            with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df3.to_excel(writer, sheet_name="BOARD STATUS", index=False)
 
             st.success("✅ Updates saved to BOARD STATUS")
@@ -404,6 +404,7 @@ elif selected_sheet == "BUG LIST":
             with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
             st.success("✅ Updates saved to BUG LIST")
+
 
 
 
