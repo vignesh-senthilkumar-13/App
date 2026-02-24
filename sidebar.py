@@ -120,29 +120,35 @@ if selected_sheet == "DASHBOARD":
 
     import streamlit as st
     import pandas as pd
+    from datetime import datetime
     
-    # Example data (replace with get_data("BOARD STATUS"))
-    df3 = pd.DataFrame({
-        "Device": ["4842", "4832"],
-        "Version": ["A0", "A1"],
-        "Status": ["DESIGN", "FAB"],
-        "DATE": ["2026-02-25", "2026-03-02"]
-    })
+    # Load BOARD STATUS data from Excel
+    df3 = get_data("BOARD STATUS")
+    df3 = df3.reset_index(drop=True)
+    
+    # Ensure DATE column is datetime
+    if "DATE" in df3.columns:
+        df3["DATE"] = pd.to_datetime(df3["DATE"], errors="coerce")
+    
+    st.title("BOARD STATUS – Stage Flow")
     
     # Define ordered stages
     status_stages = ["DESIGN", "FAB", "BOARD", "PCB", "DONE"]
     
-    st.title("BOARD STATUS – Stage Flow")
-    
-    # Loop through each version
+    # Loop through each Version in Excel
     for version, group in df3.groupby("Version"):
         st.subheader(f"Version {version}")
     
-        # Find current stage for this version
-        current_status = group["Status"].iloc[-1] if not group.empty else "DESIGN"
+        # Find the latest status for this version
+        if not group.empty:
+            current_status = group.sort_values("DATE")["Status"].iloc[-1]
+        else:
+            current_status = "DESIGN"
+    
+        # Map to stage index
         current_index = status_stages.index(current_status) if current_status in status_stages else 0
     
-        # Slider showing stage progression
+        # Slider for stage progression
         stage_index = st.slider(
             f"Progression for Version {version}",
             min_value=0,
@@ -154,6 +160,7 @@ if selected_sheet == "DASHBOARD":
     
         # Display the selected stage
         st.write(f"➡️ Current Stage: **{status_stages[stage_index]}**")
+
 
 
 
@@ -395,6 +402,7 @@ elif selected_sheet == "BUG LIST":
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
 
             st.success("✅ Updates saved to BUG LIST with new bugs auto‑populated")
+
 
 
 
