@@ -164,6 +164,22 @@ if selected_sheet == "DASHBOARD":
     
         # Display the selected stage
         st.write(f"➡️ Current Stage: **{stage}**")
+        # Stage slider (unchanged)
+
+
+        # --- NEW: Show full timeline with all stage names ---
+        current_index = status_stages.index(stage)
+        timeline = []
+        for i, s in enumerate(status_stages):
+            if i < current_index:
+                timeline.append(f"<span style='color:green'>✔ {s}</span>")
+            elif i == current_index:
+                timeline.append(f"<span style='color:blue'><b>➡ {s}</b></span>")
+            else:
+                timeline.append(f"<span style='color:gray'>○ {s}</span>")
+        
+        st.markdown(" → ".join(timeline), unsafe_allow_html=True)
+
   #-------------------------------------------------------------------------  
     import streamlit as st
     import pandas as pd
@@ -388,6 +404,7 @@ elif selected_sheet == "BUG LIST":
             with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
             st.success("✅ Updates saved to BUG LIST")
+
 
 
 
