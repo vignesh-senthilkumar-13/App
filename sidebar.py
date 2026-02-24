@@ -143,20 +143,38 @@ if selected_sheet == "DASHBOARD":
     else:
         st.info("No upcoming deadlines within 7 days.")
     
-    # --- Timeline Visualization ---
-    st.subheader("📈 Interactive Status Timeline")
+    # --- Status Flow Timeline ---
+    st.subheader("📈 Status Progression Flow")
     
-    fig = px.scatter(
+    # Sort by date so statuses appear in order
+    df3 = df3.sort_values("DATE")
+    
+    # Map statuses to a numeric order for plotting
+    status_order = {"DESIGN":1, "FAB":2, "BOARD":3, "PCB":4, "DONE":5}
+    df3["StatusOrder"] = df3["Status"].map(status_order)
+    
+    fig = px.line(
         df3,
         x="DATE",
-        y="Device",
-        color="Status",
-        symbol="Version",
-        hover_data=["Version", "Status"],
-        title="Board Status Progression Over Time"
+        y="StatusOrder",
+        color="Device",
+        markers=True,
+        text="Status",
+        hover_data=["Device","Version","Status"],
+        title="Status Progression Timeline"
     )
     
+    # Replace numeric y-axis with status labels
+    fig.update_yaxes(
+        tickvals=list(status_order.values()),
+        ticktext=list(status_order.keys())
+    )
+    
+    # Show status labels on points
+    fig.update_traces(textposition="top center")
+    
     st.plotly_chart(fig, use_container_width=True)
+
 
 
 elif selected_sheet == "BOARD STATUS":
@@ -395,6 +413,7 @@ elif selected_sheet == "BUG LIST":
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
 
             st.success("✅ Updates saved to BUG LIST with new bugs auto‑populated")
+
 
 
 
