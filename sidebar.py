@@ -18,7 +18,7 @@ import streamlit as st
 
 def commit_to_github(repo_name, file_path, commit_message, branch="main"):
     token = st.secrets["GITHUB_TOKEN"]
-    g = Github(token)
+    g = Github(auth=Auth.Token(token))
     repo = g.get_repo(repo_name)
 
     # Read local file content
@@ -434,6 +434,7 @@ elif selected_sheet == "BUG LIST":
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
             st.success("✅ Updates saved to BUG LIST")
             commit_to_github(repo_name="vignesh-senthilkumar-13/App", file_path=excel_file, commit_message="Update BOARD STATUS sheet")
+
 
 
 
