@@ -9,7 +9,7 @@ LOCAL_FILE = r"C:\Users\vigneshs1\Desktop\Device_Management.xlsx"
 st.set_page_config(page_title="Board Shipment Tracker", layout="wide")
 st_autorefresh(interval=30000)
 
-excel_file = "Test.xlsx"
+excel_file =  r"C:\Users\vigneshs1\Desktop\Device_Management.xlsx"
 
 def get_data(sheet: str) -> pd.DataFrame:
     df = pd.read_excel(excel_file, sheet_name=sheet)
@@ -46,193 +46,80 @@ st.title("📊 Dashboard" )
 
 if selected_sheet == "DASHBOARD":
     col1, col2, col3 = st.columns((1, 1.5, 1))
-    with col1:
-        df3 = get_data("BOARD STATUS")
-        df3 = df3.reset_index(drop=True)
-        # Ensure DATE column is datetime
-        if "DATE" in df3.columns:
-            df3["DATE"] = pd.to_datetime(df3["DATE"], errors="coerce")
+    with st.container():
+        with col1:
+            # st.markdown("<div class='box'>Column 1 content</div>", unsafe_allow_html=True)
+            df3 = get_data("BOARD STATUS")
+            df3 = df3.reset_index(drop=True)
+            # Ensure DATE column is datetime
+            if "DATE" in df3.columns:
+                df3["DATE"] = pd.to_datetime(df3["DATE"], errors="coerce")
 
-        st.title("BOARD STATUS")
+            st.title("BOARD STATUS")
 
-        # --- Upcoming deadlines section ---
-        st.subheader("⚠️ Upcoming Deadlines (within 7 days)")
-        today = datetime.today().date()
-        upcoming = df3[df3["DATE"].dt.date <= today + timedelta(days=7)]
+            # --- Upcoming deadlines section ---
+            st.subheader("⚠️ Upcoming Deadlines (within 7 days)")
+            today = datetime.today().date()
+            upcoming = df3[df3["DATE"].dt.date <= today + timedelta(days=7)]
 
-        if not upcoming.empty:
-            st.metric("Entries Due Soon", len(upcoming))
-            upcoming_display = upcoming.copy()
-            st.table(upcoming_display[["Device", "Version", "Status", "DATE"]])
-        else:
-            st.info("No upcoming deadlines within 7 days.")
-    with col2:
-        df1 = get_data("BOARDS")
-        df1 = df1.reset_index(drop=True)
-        # Ensure DATE column is datetime
-        if "DATE" in df1.columns:
-            df1["DATE"] = pd.to_datetime(df1["DATE"], errors="coerce")
-
-        st.title("📦 Board Shipment Tracker")
-
-        # --- Upcoming deadlines section ---
-        st.subheader("⚠️ Upcoming Deadlines (within 7 days)")
-        today = datetime.today().date()
-        upcoming_boards = df1[df1["DATE"].dt.date <= today + timedelta(days=7)]
-
-        if not upcoming_boards.empty:
-            st.metric("Shipments Due Soon", len(upcoming_boards))
-            upcoming_display = upcoming_boards.copy()
-            upcoming_display["Quantity"] = upcoming_display["Quantity"].fillna(0).astype(int)
-            st.table(
-                upcoming_display[["Product", "Boards", "Remaining Boards to send", "Sent from", "DATE", "Quantity"]])
-        else:
-            st.info("No upcoming shipments within 7 days.")
-    with col3:
-        st.title("🐞 Bugs Pending Verification")
-
-        # --- Load BUG LIST ---
-        df_bug = get_data("BUG LIST")
-
-        if "STATUS" in df_bug.columns:
-            # Filter only NOT VERIFIED entries
-            not_verified_df = df_bug[df_bug["STATUS"] == "NOT VERIFIED"]
-
-
-            # Device filter
-            device_filter = st.multiselect("Filter by Device", df_bug["DEVICE"].dropna().unique())
-
-            filtered_not_verified = not_verified_df.copy()
-            if device_filter:
-                filtered_not_verified = filtered_not_verified[filtered_not_verified["DEVICE"].isin(device_filter)]
-
-            if not filtered_not_verified.empty:
-                st.metric("Total NOT VERIFIED Bugs", len(filtered_not_verified))
-                st.dataframe(
-                    filtered_not_verified[["DEVICE", "TEST", "BUG", "VERSION"]],
-                    height=400
-                )
+            if not upcoming.empty:
+                st.metric("Entries Due Soon", len(upcoming))
+                upcoming_display = upcoming.copy()
+                st.table(upcoming_display[["Device", "Version", "Status", "DATE"]])
             else:
-                st.info("No bugs are currently marked as NOT VERIFIED for the selected device(s).")
+                st.info("No upcoming deadlines within 7 days.")
+        with col2:
+            df1 = get_data("BOARDS")
+            df1 = df1.reset_index(drop=True)
+            # Ensure DATE column is datetime
+            if "DATE" in df1.columns:
+                df1["DATE"] = pd.to_datetime(df1["DATE"], errors="coerce")
+
+            st.title("📦 Board Shipment Tracker")
+
+            # --- Upcoming deadlines section ---
+            st.subheader("⚠️ Upcoming Deadlines (within 7 days)")
+            today = datetime.today().date()
+            upcoming_boards = df1[df1["DATE"].dt.date <= today + timedelta(days=7)]
+
+            if not upcoming_boards.empty:
+                st.metric("Shipments Due Soon", len(upcoming_boards))
+                upcoming_display = upcoming_boards.copy()
+                upcoming_display["Quantity"] = upcoming_display["Quantity"].fillna(0).astype(int)
+                st.table(
+                    upcoming_display[["Product", "Boards", "Remaining Boards to send", "Sent from", "DATE", "Quantity"]])
+            else:
+                st.info("No upcoming shipments within 7 days.")
+        with col3:
+            st.title("🐞 Bugs Pending Verification")
+
+            # --- Load BUG LIST ---
+            df_bug = get_data("BUG LIST")
+
+            if "STATUS" in df_bug.columns:
+                # Filter only NOT VERIFIED entries
+                not_verified_df = df_bug[df_bug["STATUS"] == "NOT VERIFIED"]
 
 
+                # Device filter
+                device_filter = st.multiselect("Filter by Device", df_bug["DEVICE"].dropna().unique())
+
+                filtered_not_verified = not_verified_df.copy()
+                if device_filter:
+                    filtered_not_verified = filtered_not_verified[filtered_not_verified["DEVICE"].isin(device_filter)]
+
+                if not filtered_not_verified.empty:
+                    st.metric("Total NOT VERIFIED Bugs", len(filtered_not_verified))
+                    st.dataframe(
+                        filtered_not_verified[["DEVICE", "TEST", "BUG", "VERSION"]],
+                        height=400
+                    )
+                else:
+                    st.info("No bugs are currently marked as NOT VERIFIED for the selected device(s).")
     # Assuming df3 is your BOARD STATUS DataFrame
-    import streamlit as st
-    import pandas as pd
-    
-    # Load BOARD STATUS data from Excel
-    df3 = get_data("BOARD STATUS")
-    df3 = df3.reset_index(drop=True)
-    
-    # Ensure DATE column is datetime
-    if "DATE" in df3.columns:
-        df3["DATE"] = pd.to_datetime(df3["DATE"], errors="coerce")
-    
-    st.title("BOARD STATUS – Stage Flow")
-    
-    # Define ordered workflow stages
-    status_stages = [
-        "PCB INPUTS", "SCH DESIGN", "SCH REVIEW", "PCB-RELEASE",
-        "QUOTATION-RECEIVED", "QUOTATION-APPROVED",
-        "UNDER FAB", "BOARDS RECEIVED"
-    ]
-    
-    # Clean up Status column (strip spaces, ensure string type)
-    df3["Status"] = df3["Status"].astype(str).str.strip()
-    
-    # Loop through each Device–Version pair
-    for (device, version), group in df3.groupby(["Device", "Version"]):
-        st.subheader(f"Device {device} – Version {version}")
-    
-        # Find the latest status for this pair
-        if not group.empty:
-            current_status = group.sort_values("DATE")["Status"].iloc[-1]
-        else:
-            current_status = status_stages[0]  # default to first stage
-    
-        # Ensure current_status is valid
-        if current_status not in status_stages:
-            current_status = status_stages[0]
-    
-        # Stage slider
-        stage = st.select_slider(
-            f"Progression for Device {device}, Version {version}",
-            options=status_stages,
-            value=current_status,
-            key=f"slider_{device}_{version}"
-        )
-    
-        # Display the selected stage
-        st.write(f"➡️ Current Stage: **{stage}**")
-        # Stage slider (unchanged)
 
 
-        # --- NEW: Show full timeline with all stage names ---
-        current_index = status_stages.index(stage)
-        timeline = []
-        for i, s in enumerate(status_stages):
-            if i < current_index:
-                timeline.append(f"<span style='color:green'>✔ {s}</span>")
-            elif i == current_index:
-                timeline.append(f"<span style='color:blue'><b>➡ {s}</b></span>")
-            else:
-                timeline.append(f"<span style='color:gray'>○ {s}</span>")
-        
-        st.markdown(" → ".join(timeline), unsafe_allow_html=True)
 
-  #-------------------------------------------------------------------------  
-    import streamlit as st
-    import pandas as pd
-    
-    # Load BOARD STATUS data from Excel
-    df3 = get_data("BOARD STATUS")
-    df3 = df3.reset_index(drop=True)
-    
-    # Ensure DATE column is datetime
-    if "DATE" in df3.columns:
-        df3["DATE"] = pd.to_datetime(df3["DATE"], errors="coerce")
-    
-    st.title("BOARD STATUS – Stage Flow")
-    
-    # Define ordered workflow stages
-    status_stages = [
-        "PCB INPUTS", "SCH DESIGN", "SCH REVIEW", "PCB-RELEASE",
-        "QUOTATION-RECEIVED", "QUOTATION-APPROVED",
-        "UNDER FAB", "BOARDS RECEIVED"
-    ]
-    
-    # Clean up Status column
-    df3["Status"] = df3["Status"].astype(str).str.strip()
-    
-    # Loop through each Device–Version pair
-    for (device, version), group in df3.groupby(["Device", "Version"]):
-        st.subheader(f"Device {device} – Version {version}")
-    
-        # Find the latest status for this pair
-        if not group.empty:
-            current_status = group.sort_values("DATE")["Status"].iloc[-1]
-        else:
-            current_status = status_stages[0]
-    
-        # Ensure current_status is valid
-        if current_status not in status_stages:
-            current_status = status_stages[0]
-    
-        # Build stage flow with color coding
-        current_index = status_stages.index(current_status)
-        stage_flow = []
-        for i, s in enumerate(status_stages):
-            if i < current_index:
-                stage_flow.append(f"<span style='color:green'>✔ {s}</span>")
-            elif i == current_index:
-                stage_flow.append(f"<span style='color:blue'><b>➡ {s}</b></span>")
-            else:
-                stage_flow.append(f"<span style='color:gray'>○ {s}</span>")
-    
-        # Render inline with arrows
-        st.markdown(" → ".join(stage_flow), unsafe_allow_html=True)
-
-    
 
 elif selected_sheet == "BOARD STATUS":
     df3 = get_data("BOARD STATUS")
@@ -299,8 +186,6 @@ elif selected_sheet == "BOARD STATUS":
 
             st.success("✅ Updates saved to BOARD STATUS")
 
-
-
 elif selected_sheet == "BOARDS":
     df1 = get_data("BOARDS")
 
@@ -362,7 +247,7 @@ elif selected_sheet == "BUG LIST":
 
     st.title("🐞 Bug Tracking Dashboard – BUG LIST")
 
-    # --- Filters on all columns ---
+    # Filters
     test_filter = st.multiselect("Filter by Test", df_bug["TEST"].dropna().unique())
     bug_filter = st.multiselect("Filter by Bug", df_bug["BUG"].dropna().unique())
     device_filter = st.multiselect("Filter by Device", df_bug["DEVICE"].dropna().unique())
@@ -381,7 +266,6 @@ elif selected_sheet == "BUG LIST":
     if status_filter:
         filtered_df_bug = filtered_df_bug[filtered_df_bug["STATUS"].isin(status_filter)]
 
-    # --- Editable table ---
     with st.form("edit_form_bug"):
         edited_df_bug = st.data_editor(
             filtered_df_bug,
@@ -392,46 +276,126 @@ elif selected_sheet == "BUG LIST":
                     "Status",
                     options=["NOT VERIFIED", "IN PROGRESS", "VERIFIED", "CLOSED"],
                     width="medium"
-                ),"DEVICE": st.column_config.SelectboxColumn(
-                    "DEVICE",
-                    options=["4832",'4842','4851','4852','4992'],
-                    width="medium")
-
+                )
             }
         )
 
         save_bug = st.form_submit_button("💾 Save BUG LIST Updates")
+        # if save_bug:
+        #     # --- Important logic: auto‑populate new bug across all Device/Version ---
+        #     all_devices = df_bug["DEVICE"].unique()
+        #     all_versions = df_bug["VERSION"].unique()
+        #
+        #     # Find new bugs added in editor
+        #     new_bugs = set(edited_df_bug["BUG"]) - set(df_bug["BUG"])
+        #
+        #     rows_to_add = []
+        #     new_test = row["TEST"]
+        #     for bug in new_bugs:
+        #         for dev in all_devices:
+        #             for ver in all_versions:
+        #                 # Only add if not already present
+        #                 if not ((edited_df_bug["BUG"] == bug) &
+        #                         (edited_df_bug["DEVICE"] == dev) &
+        #                         (edited_df_bug["VERSION"] == ver)).any():
+        #                     rows_to_add.append({
+        #                         "TEST": new_test,  # leave blank or set default
+        #                         "BUG": bug,
+        #                         "DEVICE": dev,
+        #                         "VERSION": ver,
+        #                         "STATUS": "NOT VERIFIED"
+        #                     })
+        #
+        #     if rows_to_add:
+        #         edited_df_bug = pd.concat([edited_df_bug, pd.DataFrame(rows_to_add)], ignore_index=True)
+        #
+        #     # Save back to Excel
+        #     with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
+        #         edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
+        #
+        #     st.success("✅ Updates saved to BUG LIST with new bugs auto‑populated")
+        #
+        # save_bug = st.form_submit_button("💾 Save BUG LIST Updates")
         if save_bug:
+            rows_to_add = []
+
+            # Compare edited vs original to find truly new rows
+            new_rows = edited_df_bug.merge(
+                df_bug[["BUG", "DEVICE", "VERSION"]],
+                on=["BUG", "DEVICE", "VERSION"],
+                how="left",
+                indicator=True
+            )
+            new_rows = new_rows[new_rows["_merge"] == "left_only"]
+
+            # For each new row, enforce coverage
+            for _, row in new_rows.iterrows():
+                new_bug = row["BUG"]
+                new_test = row["TEST"]
+                new_device = row["DEVICE"]
+                new_version = row["VERSION"]
+
+                # 1. If this bug is new → pair with all existing devices/versions
+                if new_bug not in df_bug["BUG"].values:
+                    for dev in df_bug["DEVICE"].dropna().unique():
+                        for ver in df_bug["VERSION"].dropna().unique():
+                            exists = ((edited_df_bug["BUG"] == new_bug) &
+                                      (edited_df_bug["DEVICE"] == dev) &
+                                      (edited_df_bug["VERSION"] == ver)).any()
+                            if not exists:
+                                rows_to_add.append({
+                                    "TEST": new_test,
+                                    "BUG": new_bug,
+                                    "DEVICE": dev,
+                                    "VERSION": ver,
+                                    "STATUS": "NOT VERIFIED"
+                                })
+
+                # 2. If this device is new → pair with all existing bugs
+                if new_device not in df_bug["DEVICE"].values:
+                    for bug in df_bug["BUG"].dropna().unique():
+                        exists = ((edited_df_bug["BUG"] == bug) &
+                                  (edited_df_bug["DEVICE"] == new_device) &
+                                  (edited_df_bug["VERSION"] == new_version)).any()
+                        if not exists:
+                            test_value = df_bug.loc[df_bug["BUG"] == bug, "TEST"].iloc[0]
+                            rows_to_add.append({
+                                "TEST": test_value,
+                                "BUG": bug,
+                                "DEVICE": new_device,
+                                "VERSION": new_version,
+                                "STATUS": "NOT VERIFIED"
+                            })
+
+                # 3. If this version is new → pair with all existing bugs
+                if new_version not in df_bug["VERSION"].values:
+                    for bug in df_bug["BUG"].dropna().unique():
+                        exists = ((edited_df_bug["BUG"] == bug) &
+                                  (edited_df_bug["DEVICE"] == new_device) &
+                                  (edited_df_bug["VERSION"] == new_version)).any()
+                        if not exists:
+                            test_value = df_bug.loc[df_bug["BUG"] == bug, "TEST"].iloc[0]
+                            rows_to_add.append({
+                                "TEST": test_value,
+                                "BUG": bug,
+                                "DEVICE": new_device,
+                                "VERSION": new_version,
+                                "STATUS": "NOT VERIFIED"
+                            })
+
+            # Append missing rows
+            if rows_to_add:
+                edited_df_bug = pd.concat([edited_df_bug, pd.DataFrame(rows_to_add)], ignore_index=True)
+
+            # Save back to Excel
             with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
-            st.success("✅ Updates saved to BUG LIST")
 
+            st.success("✅ BUG LIST updated: new bugs/devices/versions mapped correctly with NOT VERIFIED")
+import streamlit as st
 
+# Inject CSS for a reusable box style
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Example row with 3 columns
+# col1, col2, col3 = st.columns(3)
 
