@@ -9,7 +9,7 @@ LOCAL_FILE = r"C:\Users\vigneshs1\Desktop\Device_Management.xlsx"
 st.set_page_config(page_title="Board Shipment Tracker", layout="wide")
 st_autorefresh(interval=30000)
 
-excel_file = "Test.xlsx"
+excel_file = "Device_Management.xlsx"
 from github import Github
 import streamlit as st
 
@@ -436,6 +436,7 @@ elif selected_sheet == "BUG LIST":
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
             st.success("✅ Updates saved to BUG LIST")
             commit_to_github(repo_name="vignesh-senthilkumar-13/App", file_path=excel_file, commit_message="Update BOARD STATUS sheet")
+
 
 
 
