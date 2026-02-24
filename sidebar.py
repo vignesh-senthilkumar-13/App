@@ -130,41 +130,28 @@ if selected_sheet == "DASHBOARD":
     if "DATE" in df3.columns:
         df3["DATE"] = pd.to_datetime(df3["DATE"], errors="coerce")
     
+    # Fix mixed-type columns
+    for col in df3.columns:
+        if df3[col].dtype == "object":
+            df3[col] = df3[col].astype(str)
+    
     st.title("BOARD STATUS – Stage Flow")
     
-    # Define ordered stages
     status_stages = ["DESIGN", "FAB", "BOARD", "PCB", "DONE"]
     
-    # Loop through each Version in Excel
     for version, group in df3.groupby("Version"):
         st.subheader(f"Version {version}")
     
-        # Find the latest status for this version
-        if not group.empty:
-            current_status = group.sort_values("DATE")["Status"].iloc[-1]
-        else:
-            current_status = "DESIGN"
+        current_status = group.sort_values("DATE")["Status"].iloc[-1] if not group.empty else "DESIGN"
     
-        # Map to stage index
-        current_index = status_stages.index(current_status) if current_status in status_stages else 0
-    
-        # Slider for stage progression
-        stage_index = st.slider(
+        stage = st.select_slider(
             f"Progression for Version {version}",
-            min_value=0,
-            max_value=len(status_stages)-1,
-            value=current_index,
-            format_func=lambda x: status_stages[x],
-            key=f"slider_{version}"   # unique key per version
+            options=status_stages,
+            value=current_status,
+            key=f"slider_{version}"
         )
     
-        # Display the selected stage
-        st.write(f"➡️ Current Stage: **{status_stages[stage_index]}**")
-
-
-
-
-
+        st.write(f"➡️ Current Stage: **{stage}**")
 
 elif selected_sheet == "BOARD STATUS":
     df3 = get_data("BOARD STATUS")
@@ -402,6 +389,7 @@ elif selected_sheet == "BUG LIST":
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
 
             st.success("✅ Updates saved to BUG LIST with new bugs auto‑populated")
+
 
 
 
