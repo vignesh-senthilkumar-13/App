@@ -10,6 +10,28 @@ st.set_page_config(page_title="Board Shipment Tracker", layout="wide")
 st_autorefresh(interval=30000)
 
 excel_file = "Test.xlsx"
+from github import Github
+import streamlit as st
+
+def commit_to_github(repo_name, file_path, commit_message, branch="main"):
+    token = st.secrets["GITHUB_TOKEN"]
+    g = Github(token)
+    repo = g.get_repo(repo_name)
+
+    # Read local file content
+    with open(file_path, "rb") as f:
+        content = f.read()
+
+    # Get file from repo and update
+    file = repo.get_contents(file_path, ref=branch)
+    repo.update_file(
+        path=file.path,
+        message=commit_message,
+        content=content,
+        sha=file.sha,
+        branch=branch
+    )
+    st.success("✅ Changes committed to GitHub")
 
 def get_data(sheet: str) -> pd.DataFrame:
     df = pd.read_excel(excel_file, sheet_name=sheet)
@@ -298,8 +320,7 @@ elif selected_sheet == "BOARD STATUS":
                 edited_df3.to_excel(writer, sheet_name="BOARD STATUS", index=False)
 
             st.success("✅ Updates saved to BOARD STATUS")
-
-
+            commit_to_github( repo_name="vignesh-senthilkumar-13/App", file_path=excel_file, commit_message="Update BOARD STATUS sheet")
 
 elif selected_sheet == "BOARDS":
     df1 = get_data("BOARDS")
@@ -357,6 +378,8 @@ elif selected_sheet == "BOARDS":
             with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df1.to_excel(writer, sheet_name="BOARDS", index=False)
             st.success("✅ Updates saved to BOARDS")
+            commit_to_github( repo_name="vignesh-senthilkumar-13/App", file_path=excel_file, commit_message="Update BOARD STATUS sheet")
+
 elif selected_sheet == "BUG LIST":
     df_bug = get_data("BUG LIST")
 
@@ -405,6 +428,9 @@ elif selected_sheet == "BUG LIST":
             with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
             st.success("✅ Updates saved to BUG LIST")
+            commit_to_github( repo_name="vignesh-senthilkumar-13/App", file_path=excel_file, commit_message="Update BOARD STATUS sheet")
+
+
 
 
 
