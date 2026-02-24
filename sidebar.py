@@ -118,41 +118,6 @@ if selected_sheet == "DASHBOARD":
 
     # Assuming df3 is your BOARD STATUS DataFrame
 
-    import streamlit as st
-    import pandas as pd
-    from datetime import datetime
-    
-    # Load BOARD STATUS data from Excel
-    df3 = get_data("BOARD STATUS")
-    df3 = df3.reset_index(drop=True)
-    
-    # Ensure DATE column is datetime
-    if "DATE" in df3.columns:
-        df3["DATE"] = pd.to_datetime(df3["DATE"], errors="coerce")
-    
-    # Fix mixed-type columns
-    for col in df3.columns:
-        if df3[col].dtype == "object":
-            df3[col] = df3[col].astype(str)
-    
-    st.title("BOARD STATUS – Stage Flow")
-    
-    status_stages = ["DESIGN", "FAB", "BOARD", "PCB", "DONE"]
-    
-    for version, group in df3.groupby("Version"):
-        st.subheader(f"Version {version}")
-    
-        current_status = group.sort_values("DATE")["Status"].iloc[-1] if not group.empty else "DESIGN"
-    
-        stage = st.select_slider(
-            f"Progression for Version {version}",
-            options=status_stages,
-            value=current_status,
-            key=f"slider_{version}"
-        )
-    
-        st.write(f"➡️ Current Stage: **{stage}**")
-
 elif selected_sheet == "BOARD STATUS":
     df3 = get_data("BOARD STATUS")
 
@@ -389,6 +354,7 @@ elif selected_sheet == "BUG LIST":
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
 
             st.success("✅ Updates saved to BUG LIST with new bugs auto‑populated")
+
 
 
 
