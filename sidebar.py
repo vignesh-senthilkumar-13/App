@@ -129,12 +129,12 @@ if selected_sheet == "DASHBOARD":
         "DATE": ["2026-02-25", "2026-03-02"]
     })
     
-    # Define the ordered stages
+    # Define ordered stages
     status_stages = ["DESIGN", "FAB", "BOARD", "PCB", "DONE"]
     
     st.title("BOARD STATUS – Stage Flow")
     
-    # Group by version so each version gets its own slider
+    # Loop through each version
     for version, group in df3.groupby("Version"):
         st.subheader(f"Version {version}")
     
@@ -142,17 +142,19 @@ if selected_sheet == "DASHBOARD":
         current_status = group["Status"].iloc[-1] if not group.empty else "DESIGN"
         current_index = status_stages.index(current_status) if current_status in status_stages else 0
     
-        # Slider for stage progression
+        # Slider showing stage progression
         stage_index = st.slider(
             f"Progression for Version {version}",
             min_value=0,
             max_value=len(status_stages)-1,
             value=current_index,
-            format_func=lambda x: status_stages[x]
+            format_func=lambda x: status_stages[x],
+            key=f"slider_{version}"   # unique key per version
         )
     
         # Display the selected stage
         st.write(f"➡️ Current Stage: **{status_stages[stage_index]}**")
+
 
 
 
@@ -393,6 +395,7 @@ elif selected_sheet == "BUG LIST":
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
 
             st.success("✅ Updates saved to BUG LIST with new bugs auto‑populated")
+
 
 
 
