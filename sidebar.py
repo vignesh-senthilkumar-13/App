@@ -137,14 +137,14 @@ if selected_sheet == "DASHBOARD":
         "UNDER FAB", "BOARDS RECEIVED"
     ]
     
-    # Clean up Status column (strip spaces, uppercase for consistency)
+    # Clean up Status column (strip spaces, ensure string type)
     df3["Status"] = df3["Status"].astype(str).str.strip()
     
-    # Loop through each Version in Excel
-    for version, group in df3.groupby("Version"):
-        st.subheader(f"Version {version}")
+    # Loop through each Device–Version pair
+    for (device, version), group in df3.groupby(["Device", "Version"]):
+        st.subheader(f"Device {device} – Version {version}")
     
-        # Find the latest status for this version
+        # Find the latest status for this pair
         if not group.empty:
             current_status = group.sort_values("DATE")["Status"].iloc[-1]
         else:
@@ -156,14 +156,15 @@ if selected_sheet == "DASHBOARD":
     
         # Stage slider
         stage = st.select_slider(
-            f"Progression for Version {version}",
+            f"Progression for Device {device}, Version {version}",
             options=status_stages,
             value=current_status,
-            key=f"slider_{version}"
+            key=f"slider_{device}_{version}"
         )
     
         # Display the selected stage
         st.write(f"➡️ Current Stage: **{stage}**")
+    
 
 
 elif selected_sheet == "BOARD STATUS":
@@ -335,6 +336,7 @@ elif selected_sheet == "BUG LIST":
             with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
             st.success("✅ Updates saved to BUG LIST")
+
 
 
 
