@@ -161,7 +161,7 @@ elif selected_sheet == "BOARD STATUS":
             column_config={
                 "Status": st.column_config.SelectboxColumn(
                     "Status",
-                    options=["Design", "FAB", "Add", "In Progress", "Done", "Hold"],
+                    options=["PCB INPUTS", "SCH DESIGN", "SCH REVIEW", "PCB-RELEASE", "QUOTATION-RECEIVED", "QUOTATION-APPROVED","UNDER FAB","BOARDS RECEIVED"],
                     width="medium"
                 ),
                 "DATE": st.column_config.DateColumn(
@@ -287,6 +287,7 @@ elif selected_sheet == "BUG LIST":
             with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
             st.success("✅ Updates saved to BUG LIST")
+
 
 
 
