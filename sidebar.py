@@ -164,7 +164,57 @@ if selected_sheet == "DASHBOARD":
     
         # Display the selected stage
         st.write(f"➡️ Current Stage: **{stage}**")
+  #-------------------------------------------------------------------------  
+    import streamlit as st
+    import pandas as pd
     
+    # Load BOARD STATUS data from Excel
+    df3 = get_data("BOARD STATUS")
+    df3 = df3.reset_index(drop=True)
+    
+    # Ensure DATE column is datetime
+    if "DATE" in df3.columns:
+        df3["DATE"] = pd.to_datetime(df3["DATE"], errors="coerce")
+    
+    st.title("BOARD STATUS – Stage Flow")
+    
+    # Define ordered workflow stages
+    status_stages = [
+        "PCB INPUTS", "SCH DESIGN", "SCH REVIEW", "PCB-RELEASE",
+        "QUOTATION-RECEIVED", "QUOTATION-APPROVED",
+        "UNDER FAB", "BOARDS RECEIVED"
+    ]
+    
+    # Clean up Status column
+    df3["Status"] = df3["Status"].astype(str).str.strip()
+    
+    # Loop through each Device–Version pair
+    for (device, version), group in df3.groupby(["Device", "Version"]):
+        st.subheader(f"Device {device} – Version {version}")
+    
+        # Find the latest status for this pair
+        if not group.empty:
+            current_status = group.sort_values("DATE")["Status"].iloc[-1]
+        else:
+            current_status = status_stages[0]
+    
+        # Ensure current_status is valid
+        if current_status not in status_stages:
+            current_status = status_stages[0]
+    
+        # Build stage flow with color coding
+        current_index = status_stages.index(current_status)
+        stage_flow = []
+        for i, s in enumerate(status_stages):
+            if i < current_index:
+                stage_flow.append(f"<span style='color:green'>✔ {s}</span>")
+            elif i == current_index:
+                stage_flow.append(f"<span style='color:blue'><b>➡ {s}</b></span>")
+            else:
+                stage_flow.append(f"<span style='color:gray'>○ {s}</span>")
+    
+        # Render inline with arrows
+        st.markdown(" → ".join(stage_flow), unsafe_allow_html=True)
 
     
 
@@ -338,6 +388,7 @@ elif selected_sheet == "BUG LIST":
             with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
             st.success("✅ Updates saved to BUG LIST")
+
 
 
 
