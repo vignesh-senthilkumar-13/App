@@ -13,11 +13,10 @@ excel_file = "Test.xlsx"
 from github import Github
 import streamlit as st
 
+from github import Github
+import streamlit as st
+
 def commit_to_github(repo_name, file_path, commit_message, branch="main"):
-    if "GITHUB_TOKEN" in st.secrets:
-        st.write("✅ GitHub token is available")
-    else:
-        st.error("❌ GitHub token not found in secrets")
     token = st.secrets["GITHUB_TOKEN"]
     g = Github(token)
     repo = g.get_repo(repo_name)
@@ -26,8 +25,10 @@ def commit_to_github(repo_name, file_path, commit_message, branch="main"):
     with open(file_path, "rb") as f:
         content = f.read()
 
-    # Get file from repo and update
-    file = repo.get_contents(file_path, ref=branch)
+    # IMPORTANT: use repo-relative path, not local path
+    repo_file_path = "Device_Management.xlsx"  # adjust if inside a folder
+
+    file = repo.get_contents(repo_file_path, ref=branch)
     repo.update_file(
         path=file.path,
         message=commit_message,
@@ -433,6 +434,7 @@ elif selected_sheet == "BUG LIST":
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
             st.success("✅ Updates saved to BUG LIST")
             commit_to_github(repo_name="vignesh-senthilkumar-13/App", file_path=excel_file, commit_message="Update BOARD STATUS sheet")
+
 
 
 
