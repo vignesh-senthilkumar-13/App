@@ -9,7 +9,7 @@ LOCAL_FILE = r"C:\Users\vigneshs1\Desktop\Device_Management.xlsx"
 st.set_page_config(page_title="Board Shipment Tracker", layout="wide")
 st_autorefresh(interval=30000)
 
-excel_file = Device_Management.xlsx"
+excel_file = "Device_Management.xlsx"
 
 def get_data(sheet: str) -> pd.DataFrame:
     df = pd.read_excel(excel_file, sheet_name=sheet)
@@ -398,5 +398,6 @@ import streamlit as st
 
 # Example row with 3 columns
 # col1, col2, col3 = st.columns(3)
+
 
 
