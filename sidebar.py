@@ -3,16 +3,14 @@ import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-# --- Google Sheets Setup ---
-scope = ["https://spreadsheets.google.com/feeds",
-         "https://www.googleapis.com/auth/drive"]
+from google.oauth2.service_account import Credentials
+import gspread
 
-creds = ServiceAccountCredentials.from_json_keyfile_dict(
-    st.secrets["gcp_service_account"], scope
-)
+creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"])
 client = gspread.authorize(creds)
 
-SHEET_ID = "YOUR_SHEET_ID"  # replace with your Google Sheet ID
+
+SHEET_ID = "https://docs.google.com/spreadsheets/d/1moWLEIQxMImvZnaJbiwstK0bGfn50g_N5gNz0aHsIak/edit?usp=sharing"  # replace with your Google Sheet ID
 
 def get_data(sheet_name: str) -> pd.DataFrame:
     worksheet = client.open_by_key(SHEET_ID).worksheet(sheet_name)
@@ -137,4 +135,5 @@ if selected_sheet == "BUG LIST":
             save_data("BUG LIST", edited_df_bug)
 
             st.success("✅ BUG LIST updated in Google Sheets")
+
 
