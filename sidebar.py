@@ -118,7 +118,7 @@ if selected_sheet == "DASHBOARD":
 
     # Assuming df3 is your BOARD STATUS DataFrame
 
-   import plotly.express as px
+import plotly.express as px
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
@@ -395,4 +395,5 @@ elif selected_sheet == "BUG LIST":
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
 
             st.success("✅ Updates saved to BUG LIST with new bugs auto‑populated")
+
 
