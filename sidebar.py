@@ -233,6 +233,7 @@ elif selected_sheet == "BOARD STATUS":
 
             st.success("✅ Updates saved to BOARD STATUS")
 
+
 elif selected_sheet == "BOARDS":
     df1 = get_data("BOARDS")
 
@@ -337,6 +338,7 @@ elif selected_sheet == "BUG LIST":
             with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
             st.success("✅ Updates saved to BUG LIST")
+
 
 
 
