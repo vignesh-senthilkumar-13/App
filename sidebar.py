@@ -25,7 +25,7 @@ def save_data(sheet_name: str, df: pd.DataFrame):
     worksheet.update([df.columns.values.tolist()] + df.values.tolist())
 
 # --- BUG LIST Section ---
-elif selected_sheet == "BUG LIST":
+if selected_sheet == "BUG LIST":
     df_bug = get_data("BUG LIST")
 
     st.title("🐞 Bug Tracking Dashboard – BUG LIST")
@@ -137,3 +137,4 @@ elif selected_sheet == "BUG LIST":
             save_data("BUG LIST", edited_df_bug)
 
             st.success("✅ BUG LIST updated in Google Sheets")
+
