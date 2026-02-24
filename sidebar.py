@@ -13,7 +13,8 @@ creds = Credentials.from_service_account_info(secrets, scopes=scope)
 client = gspread.authorize(creds)
 
 SHEET_ID = "1moWLEIQxMImvZnaJbiwstK0bGfn50g_N5gNz0aHsIak"
-worksheet = client.open_by_key(SHEET_ID).worksheet("BUG LIST")
+WORKSHEET_NAME = "BUG LIST"
 
-st.write("✅ Connected to Google Sheets!")
-st.write(worksheet.get_all_records()[:5])
+worksheet = client.open_by_key(SHEET_ID).worksheet(WORKSHEET_NAME)
+print("✅ Connected to Google Sheets!")
+print(worksheet.get_all_records()[:5])
