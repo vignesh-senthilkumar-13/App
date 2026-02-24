@@ -324,7 +324,7 @@ elif selected_sheet == "BOARD STATUS":
                 edited_df3.to_excel(writer, sheet_name="BOARD STATUS", index=False)
 
             st.success("✅ Updates saved to BOARD STATUS")
-            commit_to_github( repo_name="vignesh-senthilkumar-13/App", file_path=excel_file, commit_message="Update BOARD STATUS sheet")
+            commit_to_github(repo_name="vignesh-senthilkumar-13/App", file_path=excel_file, commit_message="Update BOARD STATUS sheet")
 
 elif selected_sheet == "BOARDS":
     df1 = get_data("BOARDS")
@@ -382,7 +382,7 @@ elif selected_sheet == "BOARDS":
             with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df1.to_excel(writer, sheet_name="BOARDS", index=False)
             st.success("✅ Updates saved to BOARDS")
-            commit_to_github( repo_name="vignesh-senthilkumar-13/App", file_path=excel_file, commit_message="Update BOARD STATUS sheet")
+            commit_to_github(repo_name="vignesh-senthilkumar-13/App", file_path=excel_file, commit_message="Update BOARD STATUS sheet")
 
 elif selected_sheet == "BUG LIST":
     df_bug = get_data("BUG LIST")
@@ -432,7 +432,8 @@ elif selected_sheet == "BUG LIST":
             with pd.ExcelWriter(excel_file, mode="a", if_sheet_exists="replace") as writer:
                 edited_df_bug.to_excel(writer, sheet_name="BUG LIST", index=False)
             st.success("✅ Updates saved to BUG LIST")
-            commit_to_github( repo_name="vignesh-senthilkumar-13/App", file_path=excel_file, commit_message="Update BOARD STATUS sheet")
+            commit_to_github(repo_name="vignesh-senthilkumar-13/App", file_path=excel_file, commit_message="Update BOARD STATUS sheet")
+
 
 
 
