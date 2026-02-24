@@ -4,6 +4,10 @@ openpyxl
 plotly
 streamlit_autorefresh
 PyGithub
+pydrive
+oauth2client
+pandas
+openpyxl
 
 
 
