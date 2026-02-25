@@ -11,6 +11,7 @@ openpyxl
 gspread
 google
 oauth2
+gsheets-connection
 
 
 
